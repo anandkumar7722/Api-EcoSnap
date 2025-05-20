@@ -117,7 +117,7 @@
         resultDiv.classList.remove('loading');
         resultDiv.innerHTML = `
           <strong>Prediction:</strong> ${data.predicted_class}<br/>
-          <strong>Confidence:</strong> ${(data.confidence * 100).toFixed(2)}%
+          <!-- <strong>Confidence:</strong> ${(data.confidence * 100).toFixed(2)}% -->
         `;
 
       } catch (err) {
