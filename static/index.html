@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Garbage Classifier Eco-Snap</title>
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 0.5em;
+      color: #1a73e8;
+    }
+
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 320px;
+      text-align: center;
+    }
+
+    input[type="file"] {
+      margin: 1em 0;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    button {
+      background: #1a73e8;
+      color: white;
+      font-weight: 600;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #155ab6;
+    }
+
+    .result {
+      margin-top: 1.5em;
+      background: #e6f0ff;
+      padding: 1em;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      color: #155ab6;
+      min-height: 50px;
+      user-select: none;
+    }
+
+    .loading {
+      color: #777;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Garbage Classifier EcoSnap</h1>
+
+  <form id="upload-form">
+    <input type="file" id="file-input" accept="image/png, image/jpeg" required />
+    <button type="submit">Classify Image</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file-input');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please select an image file (PNG or JPEG)');
+        return;
+      }
+
+      resultDiv.textContent = 'Classifying image...';
+      resultDiv.classList.add('loading');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/api/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        resultDiv.classList.remove('loading');
+        resultDiv.innerHTML = `
+          <strong>Prediction:</strong> ${data.predicted_class}<br/>
+          <strong>Confidence:</strong> ${(data.confidence * 100).toFixed(2)}%
+        `;
+
+      } catch (err) {
+        resultDiv.classList.remove('loading');
+        resultDiv.textContent = 'Failed to classify the image. ' + err.message;
+      }
+    });
+  </script>
+
+</body>
+</html>
