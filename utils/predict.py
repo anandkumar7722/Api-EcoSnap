@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class_names = ['cardboard', 'glass', 'metal', 'paper', 'plastic', 'trash']
 
 try:
-    model = tf.keras.models.load_model("model/garbage_model.keras", compile=False)
+    model = tf.keras.models.load_model("model/garbage_model.h5", compile=False)
     logger.info("✅ Model loaded successfully.")
 except Exception as e:
     logger.error(f"❌ Error loading model: {e}")
@@ -40,3 +40,5 @@ def predict_image(image: Image.Image, top_k: int = 3) -> dict:
         "predicted_class": top_predictions[0]["predicted_class"],
         "confidence": top_predictions[0]["confidence"]
     }
+
+model.save('model/garbage_model.h5')
